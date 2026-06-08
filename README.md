@@ -1,7 +1,6 @@
 # lite-harness
 
-Call all implemented agent harnesses using the Claude Agent SDK format: Claude
-Agent SDK and OpenAI Agents.
+Call all agent harnesses using the Claude Agent SDK format.
 
 lite-harness manages:
 
@@ -22,21 +21,17 @@ git clone https://github.com/LiteLLM-Labs/lite-harness.git
 cd lite-harness
 
 # install the backend server's deps once — the SDK auto-spawns it from the clone
-( cd src/sdk/server && npm install )
+npm install --prefix src/sdk/server
 
-# pick a model: point at a LiteLLM gateway…
-export LITELLM_API_BASE=https://litellm.your-company.com/v1
-export LITELLM_API_KEY=sk-litellm-...
-# …or go direct to a vendor:
-#   export ANTHROPIC_API_KEY=sk-ant-...   # for harness "claude"
-#   export OPENAI_API_KEY=sk-...          # for harness "openai"
+# pick a model — set the key for your provider:
+export ANTHROPIC_API_KEY=sk-ant-...   # for harness "claude-code"
+export OPENAI_API_KEY=sk-...          # for harness "codex"
 ```
 
 ## TypeScript Usage
 
 ```bash
-( cd src/sdk/typescript && npm install && npm run build )
-# import "@lite-harness/sdk" from your project after `npm link`, or from dist/
+npm install --prefix src/sdk/typescript && npm run build --prefix src/sdk/typescript
 ```
 
 ```ts
@@ -44,18 +39,18 @@ import { query } from "@lite-harness/sdk";
 
 const prompt = "Fix the failing test";
 
-// Claude Agent SDK harness
+// Claude Code harness
 for await (const message of query({
   prompt,
-  options: { harness: "claude", model: "claude-opus-4-8" },
+  options: { harness: "claude-code", model: "claude-opus-4-8" },
 })) {
   console.log(message);
 }
 
-// OpenAI Agents harness
+// Codex harness
 for await (const message of query({
   prompt,
-  options: { harness: "openai", model: "gpt-5.5" },
+  options: { harness: "codex", model: "gpt-5.5" },
 })) {
   console.log(message);
 }
@@ -72,29 +67,31 @@ from lite_harness import query, AgentOptions
 
 prompt = "Fix the failing test"
 
-# Claude Agent SDK harness
+# Claude Code harness
 async for message in query(
     prompt=prompt,
-    options=AgentOptions(harness="claude", model="claude-opus-4-8"),
+    options=AgentOptions(harness="claude-code", model="claude-opus-4-8"),
 ):
     print(message)
 
-# OpenAI Agents harness
+# Codex harness
 async for message in query(
     prompt=prompt,
-    options=AgentOptions(harness="openai", model="gpt-5.5"),
+    options=AgentOptions(harness="codex", model="gpt-5.5"),
 ):
     print(message)
 ```
 
 ## Supported Harnesses
 
-- `claude`: Claude Agent SDK / Claude Code behavior.
+See [`src/sdk/server/providers/`](src/sdk/server/providers/) for the full list.
+
+- `claude-code`: Claude Agent SDK / Claude Code behavior.
   Upstream: [Python](https://github.com/anthropics/claude-agent-sdk-python),
   [TypeScript](https://github.com/anthropics/claude-agent-sdk-typescript).
-- `openai`: OpenAI Agents SDK behavior.
-  Upstream: [Python](https://github.com/openai/openai-agents-python),
-  [TypeScript](https://github.com/openai/openai-agents-js).
+- `codex`: OpenAI Codex CLI behavior.
+  Upstream: [openai/codex](https://github.com/openai/codex).
+- `pi-ai`: Pi AI behavior.
 
 ## With LiteLLM AI Gateway
 
@@ -112,7 +109,7 @@ import { query } from "@lite-harness/sdk";
 for await (const message of query({
   prompt: "Debug this production trace",
   options: {
-    harness: "openai",
+    harness: "codex",
     model: "anthropic/claude-opus-4-8",
   },
 })) {
